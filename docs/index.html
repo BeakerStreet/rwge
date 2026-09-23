@@ -86,12 +86,18 @@
   .flow h3 a { color: inherit; text-decoration: none; }
   .flow h3 a:hover { text-decoration: underline; }
   .flow .lic { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); margin-top: 0.25rem; }
-  .flow dl { margin: 0; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.3rem 1rem; font-size: 0.975rem; }
+  .flow dl { margin: 0; display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: 0.3rem 1rem; font-size: 0.975rem; }
   .flow dt { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); padding-top: 0.2rem; }
   .flow dd { margin: 0; }
   .route { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.05rem 0.4rem; border-radius: 2px; margin-left: 0.35rem; vertical-align: 0.1em; white-space: nowrap; }
   .route.doc { color: var(--ok); border: 1px solid var(--ok); }
   .route.check { color: var(--magenta); border: 1px dashed var(--magenta); }
+  .route.none { color: var(--ink-2); border: 1px solid var(--rule); }
+  .route.ours { color: var(--blue); border: 1px solid var(--blue); }
+  .step .worked { font-family: var(--mono); font-size: var(--small); color: var(--blue); }
+  .step .finding { border-left: 3px solid var(--magenta); padding-left: 0.9rem; font-size: 1rem; }
+  .flow dd a { overflow-wrap: anywhere; }
+  .flow dd .mono { font-size: 0.88em; }
 
   .talk { padding-block: 3rem; display: grid; gap: 1rem; max-width: 44rem; }
   .talk h2 { font-size: 1.6rem; font-weight: 780; font-stretch: 85%; }
@@ -136,6 +142,8 @@
     <div class="key" aria-label="Key">
       <span><span class="route doc">Documented</span> the tool publishes the scripting route we would use</span>
       <span><span class="route check">To check</span> the route is not confirmed yet</span>
+      <span><span class="route none">None documented</span> no scripting route published</span>
+      <span><span class="route ours">Ours</span> a flow we would write ourselves</span>
     </div>
   </section>
 
@@ -166,7 +174,10 @@
       <li><a href="#delight-agisoft">Agisoft Texture De-Lighter</a></li>
       <li><a href="#delight-unity">Unity De-Lighting Tool</a></li>
       <li><a href="#delight-sampler">Substance 3D Sampler Delight</a></li>
-      <li><a href="#delight-research">Methods from papers</a></li>
+      <li><a href="#delight-marigold">Marigold intrinsic decomposition</a></li>
+      <li><a href="#delight-rgbx">RGB↔X</a></li>
+      <li><a href="#delight-intrinsic">Colorful diffuse intrinsics</a></li>
+      <li><a href="#delight-sun">Sun-aware, from known geometry</a></li>
     </ol></div>
     <div><h2>Materials</h2><ol>
       <li><a href="#mat-sampler">Substance 3D Sampler Image to Material</a></li>
@@ -328,49 +339,91 @@
     <header>
       <h2 id="s-delight">De-lighting</h2>
       <p class="job">Take the sun and shadows of the capture day out of the colour, so the asset works under any lighting.</p>
-      <p class="checks">Checked for: relight the result and compare it with a photo of the place the flow never saw.</p>
+      <p class="checks">Checked for: sunlit and shadowed patches of the same surface match after correction; the result, relit, matches a photo of the place the flow never saw.</p>
+      <p class="worked">Worked through against each tool’s own documentation, 23 September 2026.</p>
+      <p class="finding">Every production tool here assumes the capture avoided hard sun. Unity’s own photogrammetry guide says strong directional shadows are “a situation that must be avoided” because they are “difficult to remove from the generated diffuse albedo texture”. Agisoft says Metashape’s tool does not support strong shadows. Aerial imagery is flown in sunlight, so hard shadows are always in the input.</p>
     </header>
     <article class="flow" id="delight-metashape">
       <div><h3><a href="#delight-metashape">De-lighting with Metashape Remove Lighting</a></h3><p class="lic">Commercial (Metashape Professional)</p></div>
       <dl>
-        <dt>In</dt><dd>Textured model</dd>
-        <dt>Out</dt><dd>Colour texture with shading evened out</dd>
-        <dt>Driven by</dt><dd>Metashape’s Python API <span class="route check">To check</span></dd>
-        <dt>Note</dt><dd>Agisoft says it targets soft lighting and does not support strong shadows. Aerial imagery has strong shadows.</dd>
+        <dt>In</dt><dd>Textured model in a Metashape chunk, optional ambient occlusion map</dd>
+        <dt>Out</dt><dd>Texture with light and dark sides evened out</dd>
+        <dt>Driven by</dt><dd><span class="mono">Chunk.removeLighting()</span> in the Python API, with colour mode, blur, mesh-noise suppression and AO settings <span class="route doc">Documented</span></dd>
+        <dt>Built for</dt><dd>Soft lighting. An “Aggressive” preset is tuned for rocks.</dd>
+        <dt>Breaks on</dt><dd>Strong shadows: “delighting in strong shadows is not supported.”</dd>
+        <dt>Source</dt><dd><a href="https://agisoft.freshdesk.com/support/solutions/articles/31000158885-remove-lighting-from-texture-in-agisoft-metashape-professional">Agisoft helpdesk</a> · <a href="https://www.agisoft.com/pdf/metashape_python_api_2_2_0.pdf">Python API 2.2.0</a>, p. 67</dd>
       </dl>
     </article>
     <article class="flow" id="delight-agisoft">
       <div><h3><a href="#delight-agisoft">De-lighting with Agisoft Texture De-Lighter</a></h3><p class="lic">Free (Agisoft)</p></div>
       <dl>
-        <dt>In</dt><dd>Model and colour texture, plus marks for lit and shadowed areas</dd>
+        <dt>In</dt><dd>Textured model, 8-bit JPEG texture, and brush strokes marking lit and shadowed areas</dd>
         <dt>Out</dt><dd>Texture with cast shadows and ambient occlusion removed</dd>
-        <dt>Driven by</dt><dd>Standalone app <span class="route check">To check</span></dd>
-        <dt>Note</dt><dd>A person sketches the light and shadow areas. Automating it means generating those marks.</dd>
+        <dt>Driven by</dt><dd>Desktop app only <span class="route none">None documented</span></dd>
+        <dt>Built for</dt><dd>Cast shadows, which the others can’t do. It needs “one stroke per material which is undoubtedly lit/shadowed”.</dd>
+        <dt>Breaks on</dt><dd>“Highly non-uniform shadows (e.g. ambient occlusion overlapping with cast shadow)”.</dd>
+        <dt>Automating it</dt><dd>Means generating the strokes ourselves, and it has no scripting route to feed them in.</dd>
+        <dt>Source</dt><dd><a href="https://agisoft.freshdesk.com/support/solutions/articles/31000158376-agisoft-texture-de-lighter-general-workflow">Agisoft helpdesk</a></dd>
       </dl>
     </article>
     <article class="flow" id="delight-unity">
-      <div><h3><a href="#delight-unity">De-lighting with Unity’s De-Lighting Tool</a></h3><p class="lic">Free (Unity, 2017)</p></div>
+      <div><h3><a href="#delight-unity">De-lighting with Unity’s De-Lighting Tool</a></h3><p class="lic">Open source (MIT, Unity)</p></div>
       <dl>
-        <dt>In</dt><dd>Baked albedo, normal, bent normal and AO maps</dd>
+        <dt>In</dt><dd>Baked base colour, normal, bent normal, ambient occlusion and position maps, optional mask</dd>
         <dt>Out</dt><dd>De-lit albedo</dd>
-        <dt>Driven by</dt><dd>Unity editor in batch mode <span class="route check">To check</span></dd>
+        <dt>Driven by</dt><dd><span class="mono">Delighting.bat</span> runs <span class="mono">Unity.exe -executeMethod DelightingCLI.Run</span> with the maps as arguments <span class="route doc">Documented</span></dd>
+        <dt>Built for</dt><dd>Objects shot on an overcast day or under an occluder. Supports Unity 2017.1 onward, so it may not run on current versions without work.</dd>
+        <dt>Breaks on</dt><dd>Hard shadows. Unity’s guide falls back to Photoshop “to remove lighting artistically”.</dd>
+        <dt>Source</dt><dd><a href="https://github.com/Unity-Technologies/DeLightingTool">GitHub</a> · <a href="https://unity3d.com/files/solutions/photogrammetry/Unity-Photogrammetry-Workflow_2017-07_v2.pdf">Unity Photogrammetry Workflow</a>, pp. 18–19, 86</dd>
       </dl>
     </article>
     <article class="flow" id="delight-sampler">
       <div><h3><a href="#delight-sampler">De-lighting with Substance 3D Sampler Delight</a></h3><p class="lic">Commercial (Adobe)</p></div>
       <dl>
         <dt>In</dt><dd>Photo or colour map</dd>
-        <dt>Out</dt><dd>De-lit colour map</dd>
-        <dt>Driven by</dt><dd>Sampler’s Python plugin API, headless not confirmed <span class="route check">To check</span></dd>
+        <dt>Out</dt><dd>De-lit colour map. The filter has no parameters.</dd>
+        <dt>Driven by</dt><dd>Python API for scripts and plugins inside Sampler, since 3.4. Running it without the app open is not documented. <span class="route check">To check</span></dd>
+        <dt>Source</dt><dd><a href="https://substance3d.adobe.com/documentation/sadoc/delighter-172823952.html">Delight (AI Powered)</a></dd>
       </dl>
     </article>
-    <article class="flow" id="delight-research">
-      <div><h3><a href="#delight-research">De-lighting with methods from papers</a></h3><p class="lic">Research code</p></div>
+    <article class="flow" id="delight-marigold">
+      <div><h3><a href="#delight-marigold">De-lighting with Marigold intrinsic decomposition</a></h3><p class="lic">Open RAIL++-M licence (ETH Zürich)</p></div>
       <dl>
-        <dt>In</dt><dd>Colour texture and geometry</dd>
-        <dt>Out</dt><dd>Albedo and an estimate of the lighting</dd>
-        <dt>Driven by</dt><dd>Implemented from the paper, kept only if it passes the relight check</dd>
-        <dt>Note</dt><dd>Intrinsic image decomposition has decades of research and no drop-in production tool.</dd>
+        <dt>In</dt><dd>An image</dd>
+        <dt>Out</dt><dd>Appearance model: albedo, roughness, metallicity. Lighting model: albedo, diffuse shading, non-diffuse residual.</dd>
+        <dt>Driven by</dt><dd>Python, as a Hugging Face Diffusers pipeline <span class="route doc">Documented</span></dd>
+        <dt>Breaks on</dt><dd>Unknown for aerial imagery. Its albedo comes from indoor synthetic datasets (InteriorVerse, Hypersim), so roofs and roads from above are out of what it has seen.</dd>
+        <dt>Source</dt><dd><a href="https://huggingface.co/prs-eth/marigold-iid-lighting-v1-1">Model card</a> · <a href="https://huggingface.co/docs/diffusers/en/using-diffusers/marigold_usage">Diffusers docs</a></dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-rgbx">
+      <div><h3><a href="#delight-rgbx">De-lighting with RGB↔X</a></h3><p class="lic">Non-commercial only (Adobe Research, SIGGRAPH 2024)</p></div>
+      <dl>
+        <dt>In</dt><dd>An image</dd>
+        <dt>Out</dt><dd>Albedo, normals, roughness, metallicity, irradiance</dd>
+        <dt>Driven by</dt><dd>Python, released code and weights <span class="route doc">Documented</span></dd>
+        <dt>Note</dt><dd>We can test against it. The licence means we can’t ship it.</dd>
+        <dt>Source</dt><dd><a href="https://github.com/zheng95z/rgbx">GitHub</a></dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-intrinsic">
+      <div><h3><a href="#delight-intrinsic">De-lighting with colorful diffuse intrinsics</a></h3><p class="lic">Academic use only (SFU, TOG 2024)</p></div>
+      <dl>
+        <dt>In</dt><dd>An image</dd>
+        <dt>Out</dt><dd>Albedo, coloured diffuse shading, residual</dd>
+        <dt>Driven by</dt><dd>Python package from the repo <span class="route doc">Documented</span></dd>
+        <dt>Note</dt><dd>Commercial use goes through SFU’s licensing office. We can test against it; shipping needs a licence.</dd>
+        <dt>Source</dt><dd><a href="https://github.com/compphoto/Intrinsic">GitHub</a></dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-sun">
+      <div><h3><a href="#delight-sun">Sun-aware de-lighting from known geometry</a></h3><p class="lic">Our code, public-domain inputs</p></div>
+      <dl>
+        <dt>In</dt><dd>NAIP aerial imagery, a USGS 3DEP LiDAR surface model, the flight date</dd>
+        <dt>Out</dt><dd>A cast-shadow mask computed from the geometry, and colour corrected inside it</dd>
+        <dt>Driven by</dt><dd>Our code <span class="route ours">Ours</span></dd>
+        <dt>Idea</dt><dd>Aerial shadows are hard, but they are cast by geometry we already have. Find the sun direction whose shadows over the surface model best match the dark pixels, and the shadow is measured rather than guessed. Then match each shadowed surface to the same surface in sun.</dd>
+        <dt>Breaks on</dt><dd>NAIP records the date but not the time, so the sun direction has to be fitted. LiDAR and imagery can be years apart, so trees and new buildings won’t line up.</dd>
       </dl>
     </article>
   </section>
@@ -386,7 +439,7 @@
       <dl>
         <dt>In</dt><dd>Photo or colour map</dd>
         <dt>Out</dt><dd>Base colour, normal, roughness, height, with de-lighting included</dd>
-        <dt>Driven by</dt><dd>Sampler’s Python plugin API <span class="route check">To check</span></dd>
+        <dt>Driven by</dt><dd>Python API for scripts and plugins inside Sampler. Running it without the app open is not documented. <span class="route check">To check</span></dd>
       </dl>
     </article>
   </section>
