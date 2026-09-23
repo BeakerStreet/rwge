@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RWGE - Real World Game Engine</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 600px;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 1.1em;
+      margin-bottom: 30px;
+    }
+    .status {
+      background: #f0f7ff;
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .status h2 {
+      color: #667eea;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      font-size: 1em;
+    }
+    .status-item.ok { color: #22c55e; }
+    .status-item.pending { color: #f59e0b; }
+    .checkmark { font-weight: bold; margin-right: 10px; }
+    .info {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 5px;
+      margin: 20px 0;
+      text-align: left;
+      font-size: 0.9em;
+      line-height: 1.6;
+      color: #555;
+    }
+    .info h3 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Menlo', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 RWGE</h1>
+    <p class="subtitle">Real World Game Engine</p>
+
+    <div class="status">
+      <h2>System Status</h2>
+      <div class="status-item ok">
+        <span class="checkmark">✅</span> GitHub Pages Active
+      </div>
+      <div class="status-item ok">
+        <span class="checkmark">✅</span> Supabase Connected
+      </div>
+      <div class="status-item ok">
+        <span class="checkmark">✅</span> API Responsive
+      </div>
+    </div>
+
+    <div class="info">
+      <h3>Event Logging</h3>
+      <p>This project uses Supabase to log real-world game events. The API endpoint:</p>
+      <code>POST /rest/v1/events</code>
+      <p style="margin-top: 10px;">accepts the following payload:</p>
+      <code style="display: block; padding: 10px; margin-top: 10px; text-align: left; overflow-x: auto;">
+{<br>
+&nbsp;&nbsp;"test": "string (max 64 chars)",<br>
+&nbsp;&nbsp;"kind": "string (max 64 chars)",<br>
+&nbsp;&nbsp;"session_id": "string (optional)",<br>
+&nbsp;&nbsp;"payload": { /* up to 4KB JSON */ }<br>
+}
+      </code>
+    </div>
+
+    <div class="info">
+      <h3>Getting Started</h3>
+      <p>To start logging events to Supabase:</p>
+      <ol style="text-align: left; margin-left: 20px;">
+        <li>Use your Supabase publishable key for client-side requests</li>
+        <li>POST events to the REST API endpoint</li>
+        <li>Query events using the Supabase client library or REST API</li>
+      </ol>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #666; font-size: 0.9em;">
+      <p>Last updated: <span id="timestamp"></span></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('timestamp').textContent = new Date().toLocaleString();
+  </script>
+</body>
+</html>
