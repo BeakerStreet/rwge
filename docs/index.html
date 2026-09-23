@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Real World Game Engine</title>
-<meta name="description" content="The real world was never the hard part. The pipeline was. Agents for the cleanup between a captured place and a game-ready asset.">
+<meta name="description" content="Automation flows for the steps between a captured real place and a game-ready asset, one tool at a time.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
@@ -14,23 +14,18 @@
   :root {
     color-scheme: light;
     --paper: #f1f3ee;
-    --paper-2: #e5e9e1;
+    --paper-2: #e6eae2;
     --ink: #151f1c;
     --ink-2: #4b5853;
     --rule: #c7cec5;
     --magenta: #a3186b;
-    --magenta-wash: #a3186b14;
     --blue: #1c5a9c;
+    --ok: #2d6a3e;
     --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
     --body: "Source Serif 4", Georgia, "Times New Roman", serif;
     --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-    --step--1: 0.8125rem;
-    --step-0: 1.0625rem;
-    --step-1: 1.3125rem;
-    --step-2: 1.75rem;
-    --step-3: clamp(2.5rem, 6.2vw, 4.75rem);
+    --small: 0.8125rem;
     --gutter: clamp(16px, 4vw, 48px);
-    --rail: 11rem;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -41,134 +36,89 @@
       --ink-2: #9ba8a2;
       --rule: #2d3834;
       --magenta: #e467ad;
-      --magenta-wash: #e467ad1c;
       --blue: #74a9e2;
+      --ok: #7fc493;
     }
   }
 
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 1rem; }
   body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--body);
-    font-size: var(--step-0);
-    line-height: 1.6;
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--body); font-size: 1.0625rem; line-height: 1.6;
     padding-inline: var(--gutter);
     padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
     -webkit-font-smoothing: antialiased;
   }
-  .page { max-width: 72rem; margin-inline: auto; }
+  .page { max-width: 64rem; margin-inline: auto; }
   a { color: var(--blue); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
   a:hover { text-decoration-thickness: 2px; }
   a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--magenta); outline-offset: 3px; border-radius: 2px; }
-
   h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
   p { margin: 0; }
-  .label {
-    font-family: var(--mono);
-    font-size: var(--step--1);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-2);
-  }
+  .mono { font-family: var(--mono); }
 
-  /* Masthead */
-  .mast {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap;
-    padding-block: 1.25rem; border-bottom: 1px solid var(--rule);
-  }
+  .mast { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; padding-block: 1.25rem; border-bottom: 1px solid var(--rule); }
   .wordmark { font-family: var(--display); font-weight: 850; font-stretch: 118%; font-size: 1.25rem; letter-spacing: 0.02em; }
   .wordmark span { font-weight: 400; font-stretch: 100%; color: var(--ink-2); font-size: 0.95rem; letter-spacing: 0; margin-left: 0.5rem; }
-  .mast a.label { text-decoration: none; }
-  .mast a.label:hover { color: var(--magenta); }
+  .mast a { font-family: var(--mono); font-size: var(--small); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
+  .mast a:hover { color: var(--magenta); }
 
-  /* Hero */
-  .hero { padding-block: clamp(2.5rem, 7vw, 5.5rem) 1.75rem; display: grid; gap: 1.75rem; }
-  .hero h1 { font-size: var(--step-3); font-weight: 820; font-stretch: 78%; line-height: 0.98; letter-spacing: -0.01em; max-width: 16ch; }
-  .hero h1 em { font-style: normal; color: var(--magenta); display: block; }
-  .hero .sub { font-size: var(--step-1); line-height: 1.5; max-width: 38ch; }
-  .status { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
-  .status::before { content: ""; width: 0.6rem; height: 0.6rem; border-radius: 50%; border: 1.5px solid var(--magenta); }
+  .intro { padding-block: 3rem 2rem; display: grid; gap: 1rem; max-width: 44rem; }
+  .intro h1 { font-size: clamp(1.9rem, 4.2vw, 2.75rem); font-weight: 800; font-stretch: 82%; line-height: 1.08; }
+  .intro p { font-size: 1.125rem; }
+  .intro .status { font-family: var(--mono); font-size: var(--small); color: var(--ink); background: var(--paper-2); padding: 0.75rem 1rem; border-radius: 2px; }
+  .key { display: flex; gap: 1.25rem; flex-wrap: wrap; font-family: var(--mono); font-size: var(--small); color: var(--ink-2); }
 
-  .figure { margin: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-  .figure canvas { display: block; width: 100%; height: clamp(180px, 26vw, 300px); }
-  .figure figcaption {
-    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
-    padding-block: 0.5rem; font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2);
-  }
+  .toc { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); padding-block: 1.25rem 1.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 1.25rem 2rem; }
+  .toc h2 { font-size: 0.95rem; font-weight: 700; font-stretch: 90%; margin-bottom: 0.35rem; }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; font-size: 0.925rem; }
+  .toc a { text-decoration: none; color: var(--ink); }
+  .toc a:hover { color: var(--blue); text-decoration: underline; }
 
-  /* Sections with a margin rail */
-  .sec {
-    display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); gap: 1rem 2.5rem;
-    padding-block: 3.5rem; border-top: 1px solid var(--rule);
-  }
-  .figure + .sec { border-top: 0; }
-  .sec .rail { padding-top: 0.45rem; }
-  .sec .body { max-width: 42rem; display: grid; gap: 1.1rem; }
-  .sec h2 { font-size: var(--step-2); font-weight: 780; font-stretch: 85%; line-height: 1.12; letter-spacing: -0.005em; }
-  .sec h3 { font-size: var(--step-1); font-weight: 720; font-stretch: 90%; line-height: 1.2; }
+  .step { padding-block: 2.5rem 1rem; border-bottom: 1px solid var(--rule); }
+  .step > header { display: grid; gap: 0.4rem; margin-bottom: 1rem; max-width: 44rem; }
+  .step h2 { font-size: 1.6rem; font-weight: 780; font-stretch: 85%; line-height: 1.15; }
+  .step .job { color: var(--ink-2); }
+  .step .checks { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); }
 
-  /* Cleanup jobs */
-  .jobs { list-style: none; margin: 0.25rem 0 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
-  .jobs li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0.25rem 1.5rem; padding-block: 1rem; border-bottom: 1px solid var(--rule); }
-  .jobs .name { font-family: var(--display); font-weight: 700; font-stretch: 90%; font-size: 1.1rem; line-height: 1.3; display: grid; gap: 0.35rem; align-content: start; }
-  .tag {
-    justify-self: start; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--magenta); border: 1px solid var(--magenta); padding: 0.1rem 0.4rem; border-radius: 2px; font-weight: 500;
-  }
-  .then { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
-  .pull {
-    font-family: var(--display); font-weight: 700; font-stretch: 88%; font-size: var(--step-1); line-height: 1.3;
-    padding-left: 1rem; border-left: 3px solid var(--magenta); max-width: 34ch;
-  }
+  .flow { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 0.5rem 2rem; padding-block: 1.1rem; border-top: 1px solid var(--rule); }
+  .flow h3 { font-size: 1.1rem; font-weight: 700; font-stretch: 90%; line-height: 1.3; }
+  .flow h3 a { color: inherit; text-decoration: none; }
+  .flow h3 a:hover { text-decoration: underline; }
+  .flow .lic { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); margin-top: 0.25rem; }
+  .flow dl { margin: 0; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.3rem 1rem; font-size: 0.975rem; }
+  .flow dt { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); padding-top: 0.2rem; }
+  .flow dd { margin: 0; }
+  .route { display: inline-block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.05rem 0.4rem; border-radius: 2px; margin-left: 0.35rem; vertical-align: 0.1em; white-space: nowrap; }
+  .route.doc { color: var(--ok); border: 1px solid var(--ok); }
+  .route.check { color: var(--magenta); border: 1px dashed var(--magenta); }
 
-  /* Pipeline */
-  .plan-note { font-family: var(--mono); font-size: var(--step--1); background: var(--magenta-wash); padding: 0.75rem 1rem; border-radius: 2px; }
-  .stages { list-style: none; margin: 0.5rem 0 0; padding: 0; counter-reset: stage; display: grid; }
-  .stage { counter-increment: stage; display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 0 1rem; padding-block: 1.1rem; border-top: 1px solid var(--rule); }
-  .stage::before { content: counter(stage, decimal-leading-zero); font-family: var(--mono); font-size: var(--step--1); color: var(--blue); padding-top: 0.3rem; font-variant-numeric: tabular-nums; }
-  .stage .head { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
-  .stage h3 { font-size: 1.15rem; }
-  .stage .io { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); margin-top: 0.2rem; }
-  .stage .note { margin-top: 0.45rem; font-size: 0.975rem; color: var(--ink-2); }
-  .verify { margin-top: 1rem; padding: 1rem 1.1rem; border: 1px dashed var(--blue); border-radius: 2px; display: grid; gap: 0.4rem; }
-  .verify h3 { font-size: 1.15rem; }
-  .verify p { font-size: 0.975rem; color: var(--ink-2); }
-
-  /* CTA */
-  .cta { padding-block: 4rem 3.5rem; border-top: 2px solid var(--ink); display: grid; gap: 1.25rem; }
-  .cta h2 { font-size: clamp(2rem, 4.5vw, 3.25rem); font-weight: 820; font-stretch: 80%; line-height: 1.02; max-width: 18ch; }
-  .cta .lede { max-width: 40rem; font-size: var(--step-1); line-height: 1.5; }
-  form { display: grid; gap: 1rem; max-width: 40rem; margin-top: 0.5rem; }
+  .talk { padding-block: 3rem; display: grid; gap: 1rem; max-width: 44rem; }
+  .talk h2 { font-size: 1.6rem; font-weight: 780; font-stretch: 85%; }
+  form { display: grid; gap: 1rem; margin-top: 0.25rem; }
   .field { display: grid; gap: 0.35rem; }
-  .field label { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
-  .field input, .field textarea {
-    font: inherit; font-size: 1rem; color: var(--ink); background: var(--paper);
-    border: 1px solid var(--ink-2); border-radius: 2px; padding: 0.65rem 0.8rem; width: 100%;
-  }
+  .field label { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); }
+  .field input, .field textarea { font: inherit; font-size: 1rem; color: var(--ink); background: var(--paper); border: 1px solid var(--ink-2); border-radius: 2px; padding: 0.65rem 0.8rem; width: 100%; }
   .field textarea { min-height: 8rem; resize: vertical; }
   .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  .send {
-    justify-self: start; font: 500 var(--step--1) var(--mono); letter-spacing: 0.04em; text-transform: uppercase;
-    padding: 0.8rem 1.2rem; border-radius: 2px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer;
-  }
+  .send { justify-self: start; font: 500 var(--small) var(--mono); letter-spacing: 0.04em; text-transform: uppercase; padding: 0.8rem 1.2rem; border-radius: 2px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
   .send:disabled { opacity: 0.5; cursor: progress; }
-  .form-msg { font-family: var(--mono); font-size: var(--step--1); min-height: 1.2em; }
-  .form-msg.ok { color: var(--blue); }
+  .form-msg { font-family: var(--mono); font-size: var(--small); min-height: 1.2em; }
+  .form-msg.ok { color: var(--ok); }
   .form-msg.err { color: var(--magenta); }
-  .closed { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); border: 1px dashed var(--rule); padding: 0.75rem 1rem; border-radius: 2px; max-width: 40rem; }
-  .fine { font-family: var(--mono); font-size: var(--step--1); line-height: 1.6; color: var(--ink-2); max-width: 44rem; }
+  .closed { font-family: var(--mono); font-size: var(--small); color: var(--ink-2); border: 1px dashed var(--rule); padding: 0.75rem 1rem; border-radius: 2px; }
 
-  footer { border-top: 1px solid var(--rule); padding-block: 1.5rem 3rem; }
-  .foot { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
+  footer { border-top: 1px solid var(--rule); padding-block: 1.5rem 3rem; display: grid; gap: 0.75rem; font-family: var(--mono); font-size: var(--small); color: var(--ink-2); }
+  .foot { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 
-  @media (max-width: 860px) {
-    .sec { grid-template-columns: minmax(0, 1fr); padding-block: 2.75rem; }
-    .sec .rail { padding-top: 0; }
-    .jobs li { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 760px) {
+    .flow { grid-template-columns: minmax(0, 1fr); }
     .row { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 420px) {
+    .flow dl { grid-template-columns: minmax(0, 1fr); gap: 0 0; }
+    .flow dd + dt { margin-top: 0.4rem; }
   }
 </style>
 </head>
@@ -176,112 +126,360 @@
 <div class="page">
   <header class="mast">
     <div class="wordmark">RWGE<span>Real World Game Engine</span></div>
-    <a class="label" href="#talk">Talk to us</a>
+    <a href="#talk">Talk to us</a>
   </header>
 
-  <section class="hero" aria-labelledby="h1">
-    <h1 id="h1">The real world was never the hard part. <em>The pipeline was.</em></h1>
-    <p class="sub">You can capture a real place in days. What comes back is millions of triangles with the afternoon sun baked into every texture, and that is where the weeks of cleanup start. We are building agents to do that cleanup, from satellite and aerial imagery through to assets your engine can take.</p>
-    <p class="status">Early. Nothing shipped yet.</p>
-  </section>
-
-  <figure class="figure" aria-label="Illustration: a dense, irregular triangle mesh on the left resolving into a clean quad mesh on the right">
-    <canvas id="mesh" aria-hidden="true"></canvas>
-    <figcaption><span>What the scan gives you</span><span>What the engine needs · illustration</span></figcaption>
-  </figure>
-
-  <section class="sec" id="cleanup" aria-labelledby="h-cleanup">
-    <div class="rail"><span class="label">The cleanup</span></div>
-    <div class="body">
-      <h2 id="h-cleanup">The scan is the easy week.</h2>
-      <p>Photogrammetry, LiDAR and aerial imagery will give you an accurate place. None of it gives you a game asset. Between the two sits the same list of jobs, on every asset.</p>
-      <ul class="jobs">
-        <li>
-          <div class="name">Retopology <span class="tag">Where the hours go</span></div>
-          <p>The mesh arrives as dense triangle soup: millions of tris, no edge flow, non-manifold in places. Someone rebuilds it in quads, deciding one asset at a time which silhouette details matter.</p>
-        </li>
-        <li>
-          <div class="name">UV layout</div>
-          <p>Remeshing throws the UVs away. Messy topology gives you islands that won’t unwrap without distortion, and bake errors you can’t fix without starting the unwrap again.</p>
-        </li>
-        <li>
-          <div class="name">De-lighting <span class="tag">Where the hours go</span></div>
-          <p>Every texture carries the sun and shadows of the day it was shot. Getting them out, so the asset holds up under your lighting, is still mostly done by hand.</p>
-        </li>
-        <li>
-          <div class="name">Materials</div>
-          <p>You get one flat colour map. Your engine wants albedo, roughness, normals and the rest.</p>
-        </li>
-      </ul>
-      <p class="then">Then LODs, collision, scale and pivots. Then the next asset.</p>
-      <p>There is a tool for each of these. Instant Meshes, ZRemesher, Quad Remesher, Unity’s De-Lighting Tool, the shadow passes in Metashape and RealityCapture. You have probably used most of them. The work is running all of them on every asset, knowing which one to reach for, and fixing what each one breaks.</p>
-      <p class="pull">People are still the only thing that runs that pipeline. We are building agents that can.</p>
+  <section class="intro" aria-labelledby="h1">
+    <h1 id="h1">Automation flows for turning a captured place into game assets</h1>
+    <p>Each flow runs one existing tool with nobody at the controls, checks what it made, and hands a file to the next flow. One tool per flow, so each can be tested on its own and swapped when something better ships.</p>
+    <p class="status">None of these flows is built yet. This is the list we are specifying, one at a time.</p>
+    <div class="key" aria-label="Key">
+      <span><span class="route doc">Documented</span> the tool publishes the scripting route we would use</span>
+      <span><span class="route check">To check</span> the route is not confirmed yet</span>
     </div>
   </section>
 
-  <section class="sec" id="pipeline" aria-labelledby="h-pipe">
-    <div class="rail"><span class="label">The plan</span></div>
-    <div class="body">
-      <h2 id="h-pipe">From 2D imagery to a place in your engine.</h2>
-      <p class="plan-note">We can’t do this yet. This is the plan, stage by stage. Nothing below is shipped.</p>
-      <p>Agents do the work inside each stage, with the same tools you would use, and pick up new ones as they ship. Every hand-off between stages is a file with checks, so a failure stops where it started and you can see where every surface came from.</p>
-      <ol class="stages">
-        <li class="stage"><div>
-          <div class="head"><h3>Source</h3></div>
-          <div class="io">a named location → licensed imagery, elevation, survey data</div>
-          <p class="note">A lot of free imagery forbids commercial use or 3D derived from it. Every file keeps its source and licence, so your legal team can trace any asset.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>Reconstruct</h3></div>
-          <div class="io">imagery → georeferenced 3D reconstruction</div>
-          <p class="note">Improving fast, and the output is accurate and unusable: the triangle soup above.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>Segment</h3></div>
-          <div class="io">reconstruction → buildings, ground, roads, vegetation, props</div>
-          <p class="note">Each class goes to a different method. A hangar, a kerb and a tree need different treatment.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>Infer the unseen</h3></div>
-          <div class="io">top-down view → facades, heights, occluded geometry</div>
-          <p class="note">A satellite sees roofs, one lighting condition and no facades. We measure first and generate last, and every surface is tagged measured or inferred, so you always know which is which.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>Build the mesh</h3></div>
-          <div class="io">segmented scene → meshes in Blender</div>
-          <p class="note">Per object: reconstruct it, place a library asset, or generate it procedurally.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>Optimise for play</h3><span class="tag">Where the hours go</span></div>
-          <div class="io">meshes → retopology, UVs, LOD chain, collision, to your budgets</div>
-          <p class="note">Built to your triangle and texture budgets, which differ by platform and genre.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>De-light and texture</h3><span class="tag">Where the hours go</span></div>
-          <div class="io">captured colour → true albedo → PBR materials</div>
-          <p class="note">True colour first. Full de-lighting can be checked: relight the result and compare it with a real capture.</p>
-        </div></li>
-        <li class="stage"><div>
-          <div class="head"><h3>Compile</h3></div>
-          <div class="io">assets → your engine, your formats, your conventions</div>
-        </div></li>
-      </ol>
-      <div class="verify">
-        <h3>Verify, at every hand-off</h3>
-        <p>Each stage has to pass a check before the next one runs. Budgets, seams, scale and footprints are checked in code. Whether the place is right is checked against photos the pipeline never saw.</p>
-      </div>
-    </div>
+  <nav class="toc" aria-label="All flows">
+    <div><h2>Source</h2><ol>
+      <li><a href="#shells-footprints-lidar">Building shells from footprints and LiDAR</a></li>
+      <li><a href="#reconstruct-realityscan">Reconstruction with RealityScan</a></li>
+      <li><a href="#reconstruct-colmap">Reconstruction with COLMAP</a></li>
+    </ol></div>
+    <div><h2>Retopology</h2><ol>
+      <li><a href="#retopo-instant-meshes">Instant Meshes</a></li>
+      <li><a href="#retopo-quadriflow">QuadriFlow in Blender</a></li>
+      <li><a href="#retopo-quad-remesher">Quad Remesher</a></li>
+      <li><a href="#retopo-zremesher">ZRemesher</a></li>
+    </ol></div>
+    <div><h2>UVs</h2><ol>
+      <li><a href="#uv-xatlas">xatlas</a></li>
+      <li><a href="#uv-blender">Blender unwrap and pack</a></li>
+      <li><a href="#uv-rizomuv">RizomUV</a></li>
+    </ol></div>
+    <div><h2>Baking</h2><ol>
+      <li><a href="#bake-blender">Blender Cycles</a></li>
+      <li><a href="#bake-sat">Substance Automation Toolkit</a></li>
+      <li><a href="#bake-marmoset">Marmoset Toolbag</a></li>
+    </ol></div>
+    <div><h2>De-lighting</h2><ol>
+      <li><a href="#delight-metashape">Metashape Remove Lighting</a></li>
+      <li><a href="#delight-agisoft">Agisoft Texture De-Lighter</a></li>
+      <li><a href="#delight-unity">Unity De-Lighting Tool</a></li>
+      <li><a href="#delight-sampler">Substance 3D Sampler Delight</a></li>
+      <li><a href="#delight-research">Methods from papers</a></li>
+    </ol></div>
+    <div><h2>Materials</h2><ol>
+      <li><a href="#mat-sampler">Substance 3D Sampler Image to Material</a></li>
+    </ol></div>
+    <div><h2>LODs</h2><ol>
+      <li><a href="#lod-simplygon">Simplygon</a></li>
+      <li><a href="#lod-meshoptimizer">meshoptimizer</a></li>
+      <li><a href="#lod-blender">Blender Decimate</a></li>
+    </ol></div>
+    <div><h2>Collision</h2><ol>
+      <li><a href="#col-coacd">CoACD</a></li>
+      <li><a href="#col-vhacd">V-HACD</a></li>
+    </ol></div>
+    <div><h2>Into the engine</h2><ol>
+      <li><a href="#engine-unreal">Unreal Engine</a></li>
+      <li><a href="#engine-unity">Unity</a></li>
+    </ol></div>
+  </nav>
+
+  <section class="step" aria-labelledby="s-source">
+    <header>
+      <h2 id="s-source">Source</h2>
+      <p class="job">Get a real place into 3D, from imagery we are allowed to use.</p>
+      <p class="checks">Checked for: licence and source recorded on every file, footprint against imagery, scale.</p>
+    </header>
+    <article class="flow" id="shells-footprints-lidar">
+      <div><h3><a href="#shells-footprints-lidar">Building shells from footprints and LiDAR heights, in Blender</a></h3><p class="lic">Public-domain imagery · ODbL footprints</p></div>
+      <dl>
+        <dt>In</dt><dd>A US location: NAIP aerial imagery, USGS 3DEP LiDAR, Microsoft building footprints</dd>
+        <dt>Out</dt><dd>Building shells extruded to measured heights, imagery projected onto roofs and ground</dd>
+        <dt>Driven by</dt><dd>Headless Blender (<span class="mono">bpy</span>), data from Planetary Computer <span class="route doc">Documented</span></dd>
+        <dt>Note</dt><dd>Measured, not guessed, but only footprint and height. No facades.</dd>
+      </dl>
+    </article>
+    <article class="flow" id="reconstruct-realityscan">
+      <div><h3><a href="#reconstruct-realityscan">Reconstruction with RealityScan (formerly RealityCapture)</a></h3><p class="lic">Epic Games</p></div>
+      <dl>
+        <dt>In</dt><dd>Photos or drone imagery, optional LiDAR</dd>
+        <dt>Out</dt><dd>Dense textured mesh</dd>
+        <dt>Driven by</dt><dd>Command-line interface, including a Linux CLI build from 2.1 <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="reconstruct-colmap">
+      <div><h3><a href="#reconstruct-colmap">Reconstruction with COLMAP</a></h3><p class="lic">Open source</p></div>
+      <dl>
+        <dt>In</dt><dd>Photos</dd>
+        <dt>Out</dt><dd>Camera poses, dense point cloud, mesh</dd>
+        <dt>Driven by</dt><dd>Command line <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
   </section>
 
-  <section class="cta" id="talk" aria-labelledby="h-talk">
-    <h2 id="h-talk">Building a real place next?</h2>
-    <p class="lede">Tell us where the cleanup hurts: which step, how many hours, how many people. We’d like to talk, not sign you up for anything.</p>
+  <section class="step" aria-labelledby="s-retopo">
+    <header>
+      <h2 id="s-retopo">Retopology</h2>
+      <p class="job">Dense triangle soup to clean quads at a target budget.</p>
+      <p class="checks">Checked for: face count within budget, manifold, distance from the source surface, silhouette.</p>
+    </header>
+    <article class="flow" id="retopo-instant-meshes">
+      <div><h3><a href="#retopo-instant-meshes">Retopology with Instant Meshes</a></h3><p class="lic">Open source</p></div>
+      <dl>
+        <dt>In</dt><dd>Dense mesh (OBJ, PLY)</dd>
+        <dt>Out</dt><dd>Quad-dominant mesh at a target face or vertex count</dd>
+        <dt>Driven by</dt><dd>Batch mode on the command line <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="retopo-quadriflow">
+      <div><h3><a href="#retopo-quadriflow">Retopology with QuadriFlow in Blender</a></h3><p class="lic">Built into Blender</p></div>
+      <dl>
+        <dt>In</dt><dd>Dense mesh</dd>
+        <dt>Out</dt><dd>All-quad mesh at a target face count</dd>
+        <dt>Driven by</dt><dd>Headless Blender, the QuadriFlow remesh operator <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="retopo-quad-remesher">
+      <div><h3><a href="#retopo-quad-remesher">Retopology with Quad Remesher</a></h3><p class="lic">Commercial (Exoside)</p></div>
+      <dl>
+        <dt>In</dt><dd>Dense mesh, optional material and crease guides</dd>
+        <dt>Out</dt><dd>Quad mesh with edge loops that follow the form</dd>
+        <dt>Driven by</dt><dd>Its Blender add-on’s remesh operator, looped over objects in a script <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="retopo-zremesher">
+      <div><h3><a href="#retopo-zremesher">Retopology with ZRemesher</a></h3><p class="lic">Commercial (ZBrush)</p></div>
+      <dl>
+        <dt>In</dt><dd>Dense mesh</dd>
+        <dt>Out</dt><dd>Quad mesh</dd>
+        <dt>Driven by</dt><dd>ZScript inside a running ZBrush <span class="route check">To check</span></dd>
+        <dt>Note</dt><dd>Many artists’ default, and the hardest here to run without a person.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-uv">
+    <header>
+      <h2 id="s-uv">UVs</h2>
+      <p class="job">Lay the UVs out again after remeshing, and pack them.</p>
+      <p class="checks">Checked for: no overlaps, stretch under a threshold, texel density, padding for the target mip levels.</p>
+    </header>
+    <article class="flow" id="uv-xatlas">
+      <div><h3><a href="#uv-xatlas">UVs with xatlas</a></h3><p class="lic">Open source</p></div>
+      <dl>
+        <dt>In</dt><dd>Retopologised mesh</dd>
+        <dt>Out</dt><dd>Unwrapped, packed atlas</dd>
+        <dt>Driven by</dt><dd>Library, with Python bindings <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="uv-blender">
+      <div><h3><a href="#uv-blender">UVs with Blender unwrap and pack</a></h3><p class="lic">Built into Blender</p></div>
+      <dl>
+        <dt>In</dt><dd>Retopologised mesh</dd>
+        <dt>Out</dt><dd>Unwrapped, packed UVs</dd>
+        <dt>Driven by</dt><dd>Headless Blender, unwrap and pack operators <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="uv-rizomuv">
+      <div><h3><a href="#uv-rizomuv">UVs with RizomUV</a></h3><p class="lic">Commercial</p></div>
+      <dl>
+        <dt>In</dt><dd>Retopologised mesh</dd>
+        <dt>Out</dt><dd>Unwrapped, packed UVs with cleaner seams</dd>
+        <dt>Driven by</dt><dd>Lua scripts, or RizomUVLink from 2022.2 <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-bake">
+    <header>
+      <h2 id="s-bake">Baking</h2>
+      <p class="job">Carry the detail of the dense scan onto the clean mesh as textures.</p>
+      <p class="checks">Checked for: bake errors along seams, cage misses, normal map direction for the target engine.</p>
+    </header>
+    <article class="flow" id="bake-blender">
+      <div><h3><a href="#bake-blender">Baking with Blender Cycles</a></h3><p class="lic">Built into Blender</p></div>
+      <dl>
+        <dt>In</dt><dd>Dense scan and the UV’d low-poly mesh</dd>
+        <dt>Out</dt><dd>Normal, ambient occlusion and colour maps</dd>
+        <dt>Driven by</dt><dd>Headless Blender, bake selected to active <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="bake-sat">
+      <div><h3><a href="#bake-sat">Baking with the Substance Automation Toolkit</a></h3><p class="lic">Commercial (Adobe)</p></div>
+      <dl>
+        <dt>In</dt><dd>High and low meshes</dd>
+        <dt>Out</dt><dd>Mesh maps</dd>
+        <dt>Driven by</dt><dd>Command-line baker <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="bake-marmoset">
+      <div><h3><a href="#bake-marmoset">Baking with Marmoset Toolbag</a></h3><p class="lic">Commercial</p></div>
+      <dl>
+        <dt>In</dt><dd>High and low meshes</dd>
+        <dt>Out</dt><dd>Mesh maps</dd>
+        <dt>Driven by</dt><dd>Toolbag’s Python scripting, run without a person <span class="route check">To check</span></dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-delight">
+    <header>
+      <h2 id="s-delight">De-lighting</h2>
+      <p class="job">Take the sun and shadows of the capture day out of the colour, so the asset works under any lighting.</p>
+      <p class="checks">Checked for: relight the result and compare it with a photo of the place the flow never saw.</p>
+    </header>
+    <article class="flow" id="delight-metashape">
+      <div><h3><a href="#delight-metashape">De-lighting with Metashape Remove Lighting</a></h3><p class="lic">Commercial (Metashape Professional)</p></div>
+      <dl>
+        <dt>In</dt><dd>Textured model</dd>
+        <dt>Out</dt><dd>Colour texture with shading evened out</dd>
+        <dt>Driven by</dt><dd>Metashape’s Python API <span class="route check">To check</span></dd>
+        <dt>Note</dt><dd>Agisoft says it targets soft lighting and does not support strong shadows. Aerial imagery has strong shadows.</dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-agisoft">
+      <div><h3><a href="#delight-agisoft">De-lighting with Agisoft Texture De-Lighter</a></h3><p class="lic">Free (Agisoft)</p></div>
+      <dl>
+        <dt>In</dt><dd>Model and colour texture, plus marks for lit and shadowed areas</dd>
+        <dt>Out</dt><dd>Texture with cast shadows and ambient occlusion removed</dd>
+        <dt>Driven by</dt><dd>Standalone app <span class="route check">To check</span></dd>
+        <dt>Note</dt><dd>A person sketches the light and shadow areas. Automating it means generating those marks.</dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-unity">
+      <div><h3><a href="#delight-unity">De-lighting with Unity’s De-Lighting Tool</a></h3><p class="lic">Free (Unity, 2017)</p></div>
+      <dl>
+        <dt>In</dt><dd>Baked albedo, normal, bent normal and AO maps</dd>
+        <dt>Out</dt><dd>De-lit albedo</dd>
+        <dt>Driven by</dt><dd>Unity editor in batch mode <span class="route check">To check</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-sampler">
+      <div><h3><a href="#delight-sampler">De-lighting with Substance 3D Sampler Delight</a></h3><p class="lic">Commercial (Adobe)</p></div>
+      <dl>
+        <dt>In</dt><dd>Photo or colour map</dd>
+        <dt>Out</dt><dd>De-lit colour map</dd>
+        <dt>Driven by</dt><dd>Sampler’s Python plugin API, headless not confirmed <span class="route check">To check</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-research">
+      <div><h3><a href="#delight-research">De-lighting with methods from papers</a></h3><p class="lic">Research code</p></div>
+      <dl>
+        <dt>In</dt><dd>Colour texture and geometry</dd>
+        <dt>Out</dt><dd>Albedo and an estimate of the lighting</dd>
+        <dt>Driven by</dt><dd>Implemented from the paper, kept only if it passes the relight check</dd>
+        <dt>Note</dt><dd>Intrinsic image decomposition has decades of research and no drop-in production tool.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-mat">
+    <header>
+      <h2 id="s-mat">Materials</h2>
+      <p class="job">One flat colour map into the PBR channels the engine expects.</p>
+      <p class="checks">Checked for: albedo in a plausible range, roughness and normal maps present, values consistent across tiles.</p>
+    </header>
+    <article class="flow" id="mat-sampler">
+      <div><h3><a href="#mat-sampler">Materials with Substance 3D Sampler Image to Material</a></h3><p class="lic">Commercial (Adobe)</p></div>
+      <dl>
+        <dt>In</dt><dd>Photo or colour map</dd>
+        <dt>Out</dt><dd>Base colour, normal, roughness, height, with de-lighting included</dd>
+        <dt>Driven by</dt><dd>Sampler’s Python plugin API <span class="route check">To check</span></dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-lod">
+    <header>
+      <h2 id="s-lod">LODs</h2>
+      <p class="job">A chain of cheaper versions for distance.</p>
+      <p class="checks">Checked for: triangle count per level, screen-space error, UVs and seams kept.</p>
+    </header>
+    <article class="flow" id="lod-simplygon">
+      <div><h3><a href="#lod-simplygon">LODs with Simplygon</a></h3><p class="lic">Commercial</p></div>
+      <dl>
+        <dt>In</dt><dd>Game mesh and materials</dd>
+        <dt>Out</dt><dd>LOD chain, optional proxy meshes</dd>
+        <dt>Driven by</dt><dd>SDK with a Python API <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="lod-meshoptimizer">
+      <div><h3><a href="#lod-meshoptimizer">LODs with meshoptimizer</a></h3><p class="lic">Open source</p></div>
+      <dl>
+        <dt>In</dt><dd>Game mesh</dd>
+        <dt>Out</dt><dd>Simplified levels</dd>
+        <dt>Driven by</dt><dd>Library, or gltfpack on the command line <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="lod-blender">
+      <div><h3><a href="#lod-blender">LODs with Blender Decimate</a></h3><p class="lic">Built into Blender</p></div>
+      <dl>
+        <dt>In</dt><dd>Game mesh</dd>
+        <dt>Out</dt><dd>Decimated levels</dd>
+        <dt>Driven by</dt><dd>Headless Blender, Decimate modifier <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-col">
+    <header>
+      <h2 id="s-col">Collision</h2>
+      <p class="job">Simple shapes the physics engine can use.</p>
+      <p class="checks">Checked for: hull count within budget, volume against the render mesh, no gaps a player can fall through.</p>
+    </header>
+    <article class="flow" id="col-coacd">
+      <div><h3><a href="#col-coacd">Collision with CoACD</a></h3><p class="lic">Open source</p></div>
+      <dl>
+        <dt>In</dt><dd>Game mesh</dd>
+        <dt>Out</dt><dd>Convex hulls</dd>
+        <dt>Driven by</dt><dd>Python package <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="col-vhacd">
+      <div><h3><a href="#col-vhacd">Collision with V-HACD</a></h3><p class="lic">Open source</p></div>
+      <dl>
+        <dt>In</dt><dd>Game mesh</dd>
+        <dt>Out</dt><dd>Convex hulls</dd>
+        <dt>Driven by</dt><dd>Library <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="step" aria-labelledby="s-engine">
+    <header>
+      <h2 id="s-engine">Into the engine</h2>
+      <p class="job">Import, assign, and set up to the project’s conventions.</p>
+      <p class="checks">Checked for: imports clean, materials assigned, LODs and collision set up, scale and pivots.</p>
+    </header>
+    <article class="flow" id="engine-unreal">
+      <div><h3><a href="#engine-unreal">Into Unreal Engine</a></h3><p class="lic">Epic Games</p></div>
+      <dl>
+        <dt>In</dt><dd>Meshes, textures, LODs, collision</dd>
+        <dt>Out</dt><dd>Static mesh assets and materials in a project</dd>
+        <dt>Driven by</dt><dd>Python editor scripting <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+    <article class="flow" id="engine-unity">
+      <div><h3><a href="#engine-unity">Into Unity</a></h3><p class="lic">Unity</p></div>
+      <dl>
+        <dt>In</dt><dd>Meshes, textures, LODs, collision</dd>
+        <dt>Out</dt><dd>Prefabs and materials in a project</dd>
+        <dt>Driven by</dt><dd>Editor in batch mode running an editor script <span class="route doc">Documented</span></dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="talk" id="talk" aria-labelledby="h-talk">
+    <h2 id="h-talk">Run one of these tools today?</h2>
+    <p>Tell us which one, how you drive it, and where it breaks. We would like to talk.</p>
 
     <p class="closed" id="closed">The contact form opens shortly.</p>
 
     <form id="contact" hidden novalidate>
       <div class="field">
-        <label for="msg">What are you building, and where does the cleanup hurt?</label>
+        <label for="msg">Which tool, how you run it, and where it breaks</label>
         <textarea id="msg" name="msg" maxlength="2000" required></textarea>
       </div>
       <div class="row">
@@ -301,11 +499,10 @@
       <button class="send" id="send" type="submit">Send</button>
       <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
     </form>
-
-    <p class="fine">We work with named studios on named locations. We only build on imagery we can license, we leave sensitive sites out, and every asset carries its source.</p>
   </section>
 
   <footer>
+    <p>We work with named studios on named locations, only on imagery we can license, with sensitive sites left out. Every file keeps its source.</p>
     <div class="foot"><span>RWGE · Real World Game Engine</span><span>v1 · September 2026</span></div>
   </footer>
 </div>
@@ -313,97 +510,6 @@
 <script>
 // Contact form. Stays closed until the events table only accepts inserts from the public key.
 var CONTACT = { live: false, url: "", key: "" };
-
-(function () {
-  var canvas = document.getElementById('mesh');
-  var ctx = canvas.getContext('2d');
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  var seed = 7;
-  function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
-  var NU = 96, NV = 30, STEP = 6;
-  var jitter = [], diag = [];
-  for (var j = 0; j <= NV; j++) {
-    jitter.push([]); diag.push([]);
-    for (var i = 0; i <= NU; i++) { jitter[j].push([(rand() - 0.5) * 0.9, (rand() - 0.5) * 0.9]); diag[j].push(rand()); }
-  }
-  function token(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-  function height(u, v) { return 0.10 * Math.sin(u * 5.2 + v * 1.7) + 0.07 * Math.cos(v * 6.1 - u * 3.3) + 0.05 * Math.sin(u * 13 + 2); }
-  function project(u, v, W, H) {
-    var near = H * 0.97, far = H * 0.16;
-    var y = near - (near - far) * Math.pow(v, 0.78);
-    var width = W * (1.18 - 0.38 * v);
-    var x = W / 2 + (u - 0.5) * width;
-    y -= height(u, v) * H * (0.9 - 0.45 * v);
-    return [x, y];
-  }
-  function pt(i, j, W, H, soup) {
-    var u = i / NU, v = j / NV;
-    if (soup) { var jt = jitter[j][i]; u += jt[0] / NU; v += jt[1] / NV; }
-    return project(u, v, W, H);
-  }
-  function draw(split) {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var W = canvas.clientWidth, H = canvas.clientHeight;
-    if (!W || !H) return;
-    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    var ink = token('--ink'), blue = token('--blue'), magenta = token('--magenta');
-    var cut = Math.round(split * NU);
-    ctx.strokeStyle = ink; ctx.globalAlpha = 0.28; ctx.lineWidth = 0.6;
-    ctx.beginPath();
-    for (var j = 0; j < NV; j++) {
-      for (var i = 0; i < Math.min(cut, NU); i++) {
-        var a = pt(i, j, W, H, true), b = pt(i + 1, j, W, H, true), c = pt(i + 1, j + 1, W, H, true), d = pt(i, j + 1, W, H, true);
-        ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.lineTo(a[0], a[1]);
-        if (diag[j][i] > 0.5) { ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); } else { ctx.moveTo(b[0], b[1]); ctx.lineTo(d[0], d[1]); }
-        if (diag[j][i] > 0.82) { var mx = (a[0] + c[0]) / 2, my = (a[1] + c[1]) / 2; ctx.moveTo(mx, my); ctx.lineTo(b[0], b[1]); ctx.moveTo(mx, my); ctx.lineTo(d[0], d[1]); }
-      }
-    }
-    ctx.stroke();
-    ctx.globalAlpha = 0.85; ctx.strokeStyle = blue; ctx.lineWidth = 1;
-    ctx.beginPath();
-    var start = Math.ceil(cut / STEP) * STEP;
-    for (var jj = 0; jj <= NV; jj += STEP) {
-      var s = pt(start, jj, W, H, false); ctx.moveTo(s[0], s[1]);
-      for (var ii = start; ii <= NU; ii++) { var p = pt(ii, jj, W, H, false); ctx.lineTo(p[0], p[1]); }
-    }
-    for (var ic = start; ic <= NU; ic += STEP) {
-      var q = pt(ic, 0, W, H, false); ctx.moveTo(q[0], q[1]);
-      for (var jc = 0; jc <= NV; jc++) { var r = pt(ic, jc, W, H, false); ctx.lineTo(r[0], r[1]); }
-    }
-    ctx.stroke();
-    if (split > 0 && split < 1) {
-      ctx.globalAlpha = 1; ctx.strokeStyle = magenta; ctx.lineWidth = 2;
-      ctx.beginPath();
-      var m0 = pt(start, 0, W, H, false); ctx.moveTo(m0[0], m0[1]);
-      for (var jm = 1; jm <= NV; jm++) { var m = pt(start, jm, W, H, false); ctx.lineTo(m[0], m[1]); }
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
-  var target = 0.5;
-  function run() {
-    if (reduce) { draw(target); return; }
-    var t0 = null, dur = 2400, from = 0.97;
-    function frame(ts) {
-      if (t0 === null) t0 = ts;
-      var k = Math.min((ts - t0) / dur, 1);
-      draw(from + (target - from) * (1 - Math.pow(1 - k, 3)));
-      if (k < 1) requestAnimationFrame(frame);
-    }
-    draw(from);
-    requestAnimationFrame(frame);
-  }
-  var resizeTimer;
-  window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function () { draw(target); }, 80); });
-  if (window.matchMedia) {
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mq.addEventListener) mq.addEventListener('change', function () { draw(target); });
-  }
-  run();
-})();
 
 (function () {
   if (!CONTACT.live || !CONTACT.url || !CONTACT.key) return;
@@ -420,7 +526,7 @@ var CONTACT = { live: false, url: "", key: "" };
     msg.className = 'form-msg'; msg.textContent = '';
     if (form.website.value) { msg.className = 'form-msg ok'; msg.textContent = 'Sent. We’ll reply by email.'; form.reset(); return; }
     var text = form.msg.value.trim(), email = form.email.value.trim();
-    if (!text) { msg.className = 'form-msg err'; msg.textContent = 'Tell us a little about what you’re building.'; form.msg.focus(); return; }
+    if (!text) { msg.className = 'form-msg err'; msg.textContent = 'Tell us which tool and how you run it.'; form.msg.focus(); return; }
     if (!email || !form.email.checkValidity()) { msg.className = 'form-msg err'; msg.textContent = 'Add an email address we can reply to.'; form.email.focus(); return; }
     send.disabled = true; send.textContent = 'Sending';
     fetch(CONTACT.url.replace(/\/$/, '') + '/rest/v1/events', {
