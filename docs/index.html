@@ -1,133 +1,443 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RWGE - Real World Game Engine</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Real World Game Engine</title>
+<meta name="description" content="The real world was never the hard part. The pipeline was. Agents for the cleanup between a captured place and a game-ready asset.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  :root {
+    color-scheme: light;
+    --paper: #f1f3ee;
+    --paper-2: #e5e9e1;
+    --ink: #151f1c;
+    --ink-2: #4b5853;
+    --rule: #c7cec5;
+    --magenta: #a3186b;
+    --magenta-wash: #a3186b14;
+    --blue: #1c5a9c;
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --step--1: 0.8125rem;
+    --step-0: 1.0625rem;
+    --step-1: 1.3125rem;
+    --step-2: 1.75rem;
+    --step-3: clamp(2.5rem, 6.2vw, 4.75rem);
+    --gutter: clamp(16px, 4vw, 48px);
+    --rail: 11rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --paper: #111715;
+      --paper-2: #19211f;
+      --ink: #e6ebe5;
+      --ink-2: #9ba8a2;
+      --rule: #2d3834;
+      --magenta: #e467ad;
+      --magenta-wash: #e467ad1c;
+      --blue: #74a9e2;
     }
-    .container {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      max-width: 600px;
-      padding: 40px;
-      text-align: center;
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 2.5em;
-    }
-    .subtitle {
-      color: #666;
-      font-size: 1.1em;
-      margin-bottom: 30px;
-    }
-    .status {
-      background: #f0f7ff;
-      border-left: 4px solid #667eea;
-      padding: 20px;
-      margin: 30px 0;
-      border-radius: 5px;
-      text-align: left;
-    }
-    .status h2 {
-      color: #667eea;
-      font-size: 1.2em;
-      margin-bottom: 15px;
-    }
-    .status-item {
-      display: flex;
-      align-items: center;
-      margin: 10px 0;
-      font-size: 1em;
-    }
-    .status-item.ok { color: #22c55e; }
-    .status-item.pending { color: #f59e0b; }
-    .checkmark { font-weight: bold; margin-right: 10px; }
-    .info {
-      background: #f9fafb;
-      padding: 20px;
-      border-radius: 5px;
-      margin: 20px 0;
-      text-align: left;
-      font-size: 0.9em;
-      line-height: 1.6;
-      color: #555;
-    }
-    .info h3 {
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 1.1em;
-    }
-    code {
-      background: #f3f4f6;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-family: 'Monaco', 'Menlo', monospace;
-    }
-  </style>
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    padding-inline: var(--gutter);
+    padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 72rem; margin-inline: auto; }
+  a { color: var(--blue); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--magenta); outline-offset: 3px; border-radius: 2px; }
+
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  .label {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  /* Masthead */
+  .mast {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap;
+    padding-block: 1.25rem; border-bottom: 1px solid var(--rule);
+  }
+  .wordmark { font-family: var(--display); font-weight: 850; font-stretch: 118%; font-size: 1.25rem; letter-spacing: 0.02em; }
+  .wordmark span { font-weight: 400; font-stretch: 100%; color: var(--ink-2); font-size: 0.95rem; letter-spacing: 0; margin-left: 0.5rem; }
+  .mast a.label { text-decoration: none; }
+  .mast a.label:hover { color: var(--magenta); }
+
+  /* Hero */
+  .hero { padding-block: clamp(2.5rem, 7vw, 5.5rem) 1.75rem; display: grid; gap: 1.75rem; }
+  .hero h1 { font-size: var(--step-3); font-weight: 820; font-stretch: 78%; line-height: 0.98; letter-spacing: -0.01em; max-width: 16ch; }
+  .hero h1 em { font-style: normal; color: var(--magenta); display: block; }
+  .hero .sub { font-size: var(--step-1); line-height: 1.5; max-width: 38ch; }
+  .status { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
+  .status::before { content: ""; width: 0.6rem; height: 0.6rem; border-radius: 50%; border: 1.5px solid var(--magenta); }
+
+  .figure { margin: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .figure canvas { display: block; width: 100%; height: clamp(180px, 26vw, 300px); }
+  .figure figcaption {
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    padding-block: 0.5rem; font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2);
+  }
+
+  /* Sections with a margin rail */
+  .sec {
+    display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); gap: 1rem 2.5rem;
+    padding-block: 3.5rem; border-top: 1px solid var(--rule);
+  }
+  .figure + .sec { border-top: 0; }
+  .sec .rail { padding-top: 0.45rem; }
+  .sec .body { max-width: 42rem; display: grid; gap: 1.1rem; }
+  .sec h2 { font-size: var(--step-2); font-weight: 780; font-stretch: 85%; line-height: 1.12; letter-spacing: -0.005em; }
+  .sec h3 { font-size: var(--step-1); font-weight: 720; font-stretch: 90%; line-height: 1.2; }
+
+  /* Cleanup jobs */
+  .jobs { list-style: none; margin: 0.25rem 0 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
+  .jobs li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0.25rem 1.5rem; padding-block: 1rem; border-bottom: 1px solid var(--rule); }
+  .jobs .name { font-family: var(--display); font-weight: 700; font-stretch: 90%; font-size: 1.1rem; line-height: 1.3; display: grid; gap: 0.35rem; align-content: start; }
+  .tag {
+    justify-self: start; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--magenta); border: 1px solid var(--magenta); padding: 0.1rem 0.4rem; border-radius: 2px; font-weight: 500;
+  }
+  .then { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
+  .pull {
+    font-family: var(--display); font-weight: 700; font-stretch: 88%; font-size: var(--step-1); line-height: 1.3;
+    padding-left: 1rem; border-left: 3px solid var(--magenta); max-width: 34ch;
+  }
+
+  /* Pipeline */
+  .plan-note { font-family: var(--mono); font-size: var(--step--1); background: var(--magenta-wash); padding: 0.75rem 1rem; border-radius: 2px; }
+  .stages { list-style: none; margin: 0.5rem 0 0; padding: 0; counter-reset: stage; display: grid; }
+  .stage { counter-increment: stage; display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 0 1rem; padding-block: 1.1rem; border-top: 1px solid var(--rule); }
+  .stage::before { content: counter(stage, decimal-leading-zero); font-family: var(--mono); font-size: var(--step--1); color: var(--blue); padding-top: 0.3rem; font-variant-numeric: tabular-nums; }
+  .stage .head { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+  .stage h3 { font-size: 1.15rem; }
+  .stage .io { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); margin-top: 0.2rem; }
+  .stage .note { margin-top: 0.45rem; font-size: 0.975rem; color: var(--ink-2); }
+  .verify { margin-top: 1rem; padding: 1rem 1.1rem; border: 1px dashed var(--blue); border-radius: 2px; display: grid; gap: 0.4rem; }
+  .verify h3 { font-size: 1.15rem; }
+  .verify p { font-size: 0.975rem; color: var(--ink-2); }
+
+  /* CTA */
+  .cta { padding-block: 4rem 3.5rem; border-top: 2px solid var(--ink); display: grid; gap: 1.25rem; }
+  .cta h2 { font-size: clamp(2rem, 4.5vw, 3.25rem); font-weight: 820; font-stretch: 80%; line-height: 1.02; max-width: 18ch; }
+  .cta .lede { max-width: 40rem; font-size: var(--step-1); line-height: 1.5; }
+  form { display: grid; gap: 1rem; max-width: 40rem; margin-top: 0.5rem; }
+  .field { display: grid; gap: 0.35rem; }
+  .field label { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
+  .field input, .field textarea {
+    font: inherit; font-size: 1rem; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--ink-2); border-radius: 2px; padding: 0.65rem 0.8rem; width: 100%;
+  }
+  .field textarea { min-height: 8rem; resize: vertical; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .send {
+    justify-self: start; font: 500 var(--step--1) var(--mono); letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.8rem 1.2rem; border-radius: 2px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer;
+  }
+  .send:disabled { opacity: 0.5; cursor: progress; }
+  .form-msg { font-family: var(--mono); font-size: var(--step--1); min-height: 1.2em; }
+  .form-msg.ok { color: var(--blue); }
+  .form-msg.err { color: var(--magenta); }
+  .closed { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); border: 1px dashed var(--rule); padding: 0.75rem 1rem; border-radius: 2px; max-width: 40rem; }
+  .fine { font-family: var(--mono); font-size: var(--step--1); line-height: 1.6; color: var(--ink-2); max-width: 44rem; }
+
+  footer { border-top: 1px solid var(--rule); padding-block: 1.5rem 3rem; }
+  .foot { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: var(--mono); font-size: var(--step--1); color: var(--ink-2); }
+
+  @media (max-width: 860px) {
+    .sec { grid-template-columns: minmax(0, 1fr); padding-block: 2.75rem; }
+    .sec .rail { padding-top: 0; }
+    .jobs li { grid-template-columns: minmax(0, 1fr); }
+    .row { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎮 RWGE</h1>
-    <p class="subtitle">Real World Game Engine</p>
+<div class="page">
+  <header class="mast">
+    <div class="wordmark">RWGE<span>Real World Game Engine</span></div>
+    <a class="label" href="#talk">Talk to us</a>
+  </header>
 
-    <div class="status">
-      <h2>System Status</h2>
-      <div class="status-item ok">
-        <span class="checkmark">✅</span> GitHub Pages Active
-      </div>
-      <div class="status-item ok">
-        <span class="checkmark">✅</span> Supabase Connected
-      </div>
-      <div class="status-item ok">
-        <span class="checkmark">✅</span> API Responsive
-      </div>
+  <section class="hero" aria-labelledby="h1">
+    <h1 id="h1">The real world was never the hard part. <em>The pipeline was.</em></h1>
+    <p class="sub">You can capture a real place in days. What comes back is millions of triangles with the afternoon sun baked into every texture, and that is where the weeks of cleanup start. We are building agents to do that cleanup, from satellite and aerial imagery through to assets your engine can take.</p>
+    <p class="status">Early. Nothing shipped yet.</p>
+  </section>
+
+  <figure class="figure" aria-label="Illustration: a dense, irregular triangle mesh on the left resolving into a clean quad mesh on the right">
+    <canvas id="mesh" aria-hidden="true"></canvas>
+    <figcaption><span>What the scan gives you</span><span>What the engine needs · illustration</span></figcaption>
+  </figure>
+
+  <section class="sec" id="cleanup" aria-labelledby="h-cleanup">
+    <div class="rail"><span class="label">The cleanup</span></div>
+    <div class="body">
+      <h2 id="h-cleanup">The scan is the easy week.</h2>
+      <p>Photogrammetry, LiDAR and aerial imagery will give you an accurate place. None of it gives you a game asset. Between the two sits the same list of jobs, on every asset.</p>
+      <ul class="jobs">
+        <li>
+          <div class="name">Retopology <span class="tag">Where the hours go</span></div>
+          <p>The mesh arrives as dense triangle soup: millions of tris, no edge flow, non-manifold in places. Someone rebuilds it in quads, deciding one asset at a time which silhouette details matter.</p>
+        </li>
+        <li>
+          <div class="name">UV layout</div>
+          <p>Remeshing throws the UVs away. Messy topology gives you islands that won’t unwrap without distortion, and bake errors you can’t fix without starting the unwrap again.</p>
+        </li>
+        <li>
+          <div class="name">De-lighting <span class="tag">Where the hours go</span></div>
+          <p>Every texture carries the sun and shadows of the day it was shot. Getting them out, so the asset holds up under your lighting, is still mostly done by hand.</p>
+        </li>
+        <li>
+          <div class="name">Materials</div>
+          <p>You get one flat colour map. Your engine wants albedo, roughness, normals and the rest.</p>
+        </li>
+      </ul>
+      <p class="then">Then LODs, collision, scale and pivots. Then the next asset.</p>
+      <p>There is a tool for each of these. Instant Meshes, ZRemesher, Quad Remesher, Unity’s De-Lighting Tool, the shadow passes in Metashape and RealityCapture. You have probably used most of them. The work is running all of them on every asset, knowing which one to reach for, and fixing what each one breaks.</p>
+      <p class="pull">People are still the only thing that runs that pipeline. We are building agents that can.</p>
     </div>
+  </section>
 
-    <div class="info">
-      <h3>Event Logging</h3>
-      <p>This project uses Supabase to log real-world game events. The API endpoint:</p>
-      <code>POST /rest/v1/events</code>
-      <p style="margin-top: 10px;">accepts the following payload:</p>
-      <code style="display: block; padding: 10px; margin-top: 10px; text-align: left; overflow-x: auto;">
-{<br>
-&nbsp;&nbsp;"test": "string (max 64 chars)",<br>
-&nbsp;&nbsp;"kind": "string (max 64 chars)",<br>
-&nbsp;&nbsp;"session_id": "string (optional)",<br>
-&nbsp;&nbsp;"payload": { /* up to 4KB JSON */ }<br>
-}
-      </code>
-    </div>
-
-    <div class="info">
-      <h3>Getting Started</h3>
-      <p>To start logging events to Supabase:</p>
-      <ol style="text-align: left; margin-left: 20px;">
-        <li>Use your Supabase publishable key for client-side requests</li>
-        <li>POST events to the REST API endpoint</li>
-        <li>Query events using the Supabase client library or REST API</li>
+  <section class="sec" id="pipeline" aria-labelledby="h-pipe">
+    <div class="rail"><span class="label">The plan</span></div>
+    <div class="body">
+      <h2 id="h-pipe">From 2D imagery to a place in your engine.</h2>
+      <p class="plan-note">We can’t do this yet. This is the plan, stage by stage. Nothing below is shipped.</p>
+      <p>Agents do the work inside each stage, with the same tools you would use, and pick up new ones as they ship. Every hand-off between stages is a file with checks, so a failure stops where it started and you can see where every surface came from.</p>
+      <ol class="stages">
+        <li class="stage"><div>
+          <div class="head"><h3>Source</h3></div>
+          <div class="io">a named location → licensed imagery, elevation, survey data</div>
+          <p class="note">A lot of free imagery forbids commercial use or 3D derived from it. Every file keeps its source and licence, so your legal team can trace any asset.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>Reconstruct</h3></div>
+          <div class="io">imagery → georeferenced 3D reconstruction</div>
+          <p class="note">Improving fast, and the output is accurate and unusable: the triangle soup above.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>Segment</h3></div>
+          <div class="io">reconstruction → buildings, ground, roads, vegetation, props</div>
+          <p class="note">Each class goes to a different method. A hangar, a kerb and a tree need different treatment.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>Infer the unseen</h3></div>
+          <div class="io">top-down view → facades, heights, occluded geometry</div>
+          <p class="note">A satellite sees roofs, one lighting condition and no facades. We measure first and generate last, and every surface is tagged measured or inferred, so you always know which is which.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>Build the mesh</h3></div>
+          <div class="io">segmented scene → meshes in Blender</div>
+          <p class="note">Per object: reconstruct it, place a library asset, or generate it procedurally.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>Optimise for play</h3><span class="tag">Where the hours go</span></div>
+          <div class="io">meshes → retopology, UVs, LOD chain, collision, to your budgets</div>
+          <p class="note">Built to your triangle and texture budgets, which differ by platform and genre.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>De-light and texture</h3><span class="tag">Where the hours go</span></div>
+          <div class="io">captured colour → true albedo → PBR materials</div>
+          <p class="note">True colour first. Full de-lighting can be checked: relight the result and compare it with a real capture.</p>
+        </div></li>
+        <li class="stage"><div>
+          <div class="head"><h3>Compile</h3></div>
+          <div class="io">assets → your engine, your formats, your conventions</div>
+        </div></li>
       </ol>
+      <div class="verify">
+        <h3>Verify, at every hand-off</h3>
+        <p>Each stage has to pass a check before the next one runs. Budgets, seams, scale and footprints are checked in code. Whether the place is right is checked against photos the pipeline never saw.</p>
+      </div>
     </div>
+  </section>
 
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #666; font-size: 0.9em;">
-      <p>Last updated: <span id="timestamp"></span></p>
-    </div>
-  </div>
+  <section class="cta" id="talk" aria-labelledby="h-talk">
+    <h2 id="h-talk">Building a real place next?</h2>
+    <p class="lede">Tell us where the cleanup hurts: which step, how many hours, how many people. We’d like to talk, not sign you up for anything.</p>
 
-  <script>
-    document.getElementById('timestamp').textContent = new Date().toLocaleString();
-  </script>
+    <p class="closed" id="closed">The contact form opens shortly.</p>
+
+    <form id="contact" hidden novalidate>
+      <div class="field">
+        <label for="msg">What are you building, and where does the cleanup hurt?</label>
+        <textarea id="msg" name="msg" maxlength="2000" required></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" maxlength="200" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="studio">Studio (optional)</label>
+          <input id="studio" name="studio" type="text" maxlength="200" autocomplete="organization">
+        </div>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for="website">Leave this empty</label>
+        <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <button class="send" id="send" type="submit">Send</button>
+      <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+    </form>
+
+    <p class="fine">We work with named studios on named locations. We only build on imagery we can license, we leave sensitive sites out, and every asset carries its source.</p>
+  </section>
+
+  <footer>
+    <div class="foot"><span>RWGE · Real World Game Engine</span><span>v1 · September 2026</span></div>
+  </footer>
+</div>
+
+<script>
+// Contact form. Stays closed until the events table only accepts inserts from the public key.
+var CONTACT = { live: false, url: "", key: "" };
+
+(function () {
+  var canvas = document.getElementById('mesh');
+  var ctx = canvas.getContext('2d');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var seed = 7;
+  function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  var NU = 96, NV = 30, STEP = 6;
+  var jitter = [], diag = [];
+  for (var j = 0; j <= NV; j++) {
+    jitter.push([]); diag.push([]);
+    for (var i = 0; i <= NU; i++) { jitter[j].push([(rand() - 0.5) * 0.9, (rand() - 0.5) * 0.9]); diag[j].push(rand()); }
+  }
+  function token(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function height(u, v) { return 0.10 * Math.sin(u * 5.2 + v * 1.7) + 0.07 * Math.cos(v * 6.1 - u * 3.3) + 0.05 * Math.sin(u * 13 + 2); }
+  function project(u, v, W, H) {
+    var near = H * 0.97, far = H * 0.16;
+    var y = near - (near - far) * Math.pow(v, 0.78);
+    var width = W * (1.18 - 0.38 * v);
+    var x = W / 2 + (u - 0.5) * width;
+    y -= height(u, v) * H * (0.9 - 0.45 * v);
+    return [x, y];
+  }
+  function pt(i, j, W, H, soup) {
+    var u = i / NU, v = j / NV;
+    if (soup) { var jt = jitter[j][i]; u += jt[0] / NU; v += jt[1] / NV; }
+    return project(u, v, W, H);
+  }
+  function draw(split) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = canvas.clientWidth, H = canvas.clientHeight;
+    if (!W || !H) return;
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    var ink = token('--ink'), blue = token('--blue'), magenta = token('--magenta');
+    var cut = Math.round(split * NU);
+    ctx.strokeStyle = ink; ctx.globalAlpha = 0.28; ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    for (var j = 0; j < NV; j++) {
+      for (var i = 0; i < Math.min(cut, NU); i++) {
+        var a = pt(i, j, W, H, true), b = pt(i + 1, j, W, H, true), c = pt(i + 1, j + 1, W, H, true), d = pt(i, j + 1, W, H, true);
+        ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.lineTo(a[0], a[1]);
+        if (diag[j][i] > 0.5) { ctx.moveTo(a[0], a[1]); ctx.lineTo(c[0], c[1]); } else { ctx.moveTo(b[0], b[1]); ctx.lineTo(d[0], d[1]); }
+        if (diag[j][i] > 0.82) { var mx = (a[0] + c[0]) / 2, my = (a[1] + c[1]) / 2; ctx.moveTo(mx, my); ctx.lineTo(b[0], b[1]); ctx.moveTo(mx, my); ctx.lineTo(d[0], d[1]); }
+      }
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 0.85; ctx.strokeStyle = blue; ctx.lineWidth = 1;
+    ctx.beginPath();
+    var start = Math.ceil(cut / STEP) * STEP;
+    for (var jj = 0; jj <= NV; jj += STEP) {
+      var s = pt(start, jj, W, H, false); ctx.moveTo(s[0], s[1]);
+      for (var ii = start; ii <= NU; ii++) { var p = pt(ii, jj, W, H, false); ctx.lineTo(p[0], p[1]); }
+    }
+    for (var ic = start; ic <= NU; ic += STEP) {
+      var q = pt(ic, 0, W, H, false); ctx.moveTo(q[0], q[1]);
+      for (var jc = 0; jc <= NV; jc++) { var r = pt(ic, jc, W, H, false); ctx.lineTo(r[0], r[1]); }
+    }
+    ctx.stroke();
+    if (split > 0 && split < 1) {
+      ctx.globalAlpha = 1; ctx.strokeStyle = magenta; ctx.lineWidth = 2;
+      ctx.beginPath();
+      var m0 = pt(start, 0, W, H, false); ctx.moveTo(m0[0], m0[1]);
+      for (var jm = 1; jm <= NV; jm++) { var m = pt(start, jm, W, H, false); ctx.lineTo(m[0], m[1]); }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  var target = 0.5;
+  function run() {
+    if (reduce) { draw(target); return; }
+    var t0 = null, dur = 2400, from = 0.97;
+    function frame(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min((ts - t0) / dur, 1);
+      draw(from + (target - from) * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(frame);
+    }
+    draw(from);
+    requestAnimationFrame(frame);
+  }
+  var resizeTimer;
+  window.addEventListener('resize', function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(function () { draw(target); }, 80); });
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', function () { draw(target); });
+  }
+  run();
+})();
+
+(function () {
+  if (!CONTACT.live || !CONTACT.url || !CONTACT.key) return;
+  var form = document.getElementById('contact'), closed = document.getElementById('closed');
+  var send = document.getElementById('send'), msg = document.getElementById('form-msg');
+  closed.hidden = true; form.hidden = false;
+
+  var sid;
+  try { sid = sessionStorage.getItem('rwge-sid'); } catch (e) {}
+  if (!sid) { sid = Math.random().toString(36).slice(2, 12); try { sessionStorage.setItem('rwge-sid', sid); } catch (e) {} }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    msg.className = 'form-msg'; msg.textContent = '';
+    if (form.website.value) { msg.className = 'form-msg ok'; msg.textContent = 'Sent. We’ll reply by email.'; form.reset(); return; }
+    var text = form.msg.value.trim(), email = form.email.value.trim();
+    if (!text) { msg.className = 'form-msg err'; msg.textContent = 'Tell us a little about what you’re building.'; form.msg.focus(); return; }
+    if (!email || !form.email.checkValidity()) { msg.className = 'form-msg err'; msg.textContent = 'Add an email address we can reply to.'; form.email.focus(); return; }
+    send.disabled = true; send.textContent = 'Sending';
+    fetch(CONTACT.url.replace(/\/$/, '') + '/rest/v1/events', {
+      method: 'POST',
+      headers: { 'apikey': CONTACT.key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        test: 'landing-v1', kind: 'contact', session_id: sid,
+        payload: { message: text, email: email, studio: form.studio.value.trim(), page: location.pathname }
+      })
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      msg.className = 'form-msg ok'; msg.textContent = 'Sent. We’ll reply by email.'; form.reset();
+    }).catch(function () {
+      msg.className = 'form-msg err'; msg.textContent = 'That didn’t send. Check your connection and try again.';
+    }).then(function () { send.disabled = false; send.textContent = 'Send'; });
+  });
+})();
+</script>
 </body>
 </html>
