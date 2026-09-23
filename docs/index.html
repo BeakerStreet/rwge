@@ -177,7 +177,10 @@
       <li><a href="#delight-marigold">Marigold intrinsic decomposition</a></li>
       <li><a href="#delight-rgbx">RGB↔X</a></li>
       <li><a href="#delight-intrinsic">Colorful diffuse intrinsics</a></li>
+      <li><a href="#delight-surgs">SU-RGS</a></li>
+      <li><a href="#delight-irgs">IRGS++</a></li>
       <li><a href="#delight-sun">Sun-aware, from known geometry</a></li>
+      <li><a href="#delight-rebuild">Rebuild under neutral light</a></li>
     </ol></div>
     <div><h2>Materials</h2><ol>
       <li><a href="#mat-sampler">Substance 3D Sampler Image to Material</a></li>
@@ -209,7 +212,7 @@
         <dt>In</dt><dd>A US location: NAIP aerial imagery, USGS 3DEP LiDAR, Microsoft building footprints</dd>
         <dt>Out</dt><dd>Building shells extruded to measured heights, imagery projected onto roofs and ground</dd>
         <dt>Driven by</dt><dd>Headless Blender (<span class="mono">bpy</span>), data from Planetary Computer <span class="route doc">Documented</span></dd>
-        <dt>Note</dt><dd>Measured, not guessed, but only footprint and height. No facades.</dd>
+        <dt>Note</dt><dd>Measured, not guessed, but only footprint and height. No facades. Projected imagery keeps the sun baked in; see <a href="#s-delight">De-lighting</a>.</dd>
       </dl>
     </article>
     <article class="flow" id="reconstruct-realityscan">
@@ -341,7 +344,7 @@
       <p class="job">Take the sun and shadows of the capture day out of the colour, so the asset works under any lighting.</p>
       <p class="checks">Checked for: sunlit and shadowed patches of the same surface match after correction; the result, relit, matches a photo of the place the flow never saw.</p>
       <p class="worked">Worked through against each tool’s own documentation, 23 September 2026.</p>
-      <p class="finding">Every production tool here assumes the capture avoided hard sun. Unity’s own photogrammetry guide says strong directional shadows are “a situation that must be avoided” because they are “difficult to remove from the generated diffuse albedo texture”. Agisoft says Metashape’s tool does not support strong shadows. Aerial imagery is flown in sunlight, so hard shadows are always in the input.</p>
+      <p class="finding">Every production tool here assumes the capture avoided hard sun. Unity’s own photogrammetry guide says strong directional shadows are “a situation that must be avoided” because they are “difficult to remove from the generated diffuse albedo texture”. Agisoft says Metashape’s tool does not support strong shadows. Aerial imagery is flown in sunlight, so hard shadows are always in the input. That leaves two ways out at the bottom of this list: measure the shadows from geometry we already have, or skip de-lighting and rebuild the surface from scratch.</p>
     </header>
     <article class="flow" id="delight-metashape">
       <div><h3><a href="#delight-metashape">De-lighting with Metashape Remove Lighting</a></h3><p class="lic">Commercial (Metashape Professional)</p></div>
@@ -416,6 +419,25 @@
         <dt>Source</dt><dd><a href="https://github.com/compphoto/Intrinsic">GitHub</a></dd>
       </dl>
     </article>
+    <article class="flow" id="delight-surgs">
+      <div><h3><a href="#delight-surgs">De-lighting with SU-RGS</a></h3><p class="lic">Research (ICCV 2025)</p></div>
+      <dl>
+        <dt>In</dt><dd>A sparse set of photos of the place, taken under different lighting</dd>
+        <dt>Out</dt><dd>Relightable 3D Gaussians with surface materials and the environment lighting, with transient objects removed</dd>
+        <dt>Driven by</dt><dd>No released code found <span class="route none">None documented</span></dd>
+        <dt>Note</dt><dd>Needs several views, so it suits street or drone photos rather than a single aerial image.</dd>
+        <dt>Source</dt><dd><a href="https://openaccess.thecvf.com/content/ICCV2025/html/Zhang_SU-RGS_Relightable_3D_Gaussian_Splatting_from_Sparse_Views_under_Unconstrained_ICCV_2025_paper.html">ICCV 2025 paper</a></dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-irgs">
+      <div><h3><a href="#delight-irgs">De-lighting with IRGS++</a></h3><p class="lic">Research (July 2026)</p></div>
+      <dl>
+        <dt>In</dt><dd>Multi-view photos</dd>
+        <dt>Out</dt><dd>Albedo, roughness, metallic and lighting, including inter-reflections, so glass and metal are handled</dd>
+        <dt>Driven by</dt><dd>No released code found <span class="route none">None documented</span></dd>
+        <dt>Source</dt><dd><a href="https://arxiv.org/abs/2607.22780">arXiv 2607.22780</a></dd>
+      </dl>
+    </article>
     <article class="flow" id="delight-sun">
       <div><h3><a href="#delight-sun">Sun-aware de-lighting from known geometry</a></h3><p class="lic">Our code, public-domain inputs</p></div>
       <dl>
@@ -424,6 +446,17 @@
         <dt>Driven by</dt><dd>Our code <span class="route ours">Ours</span></dd>
         <dt>Idea</dt><dd>Aerial shadows are hard, but they are cast by geometry we already have. Find the sun direction whose shadows over the surface model best match the dark pixels, and the shadow is measured rather than guessed. Then match each shadowed surface to the same surface in sun.</dd>
         <dt>Breaks on</dt><dd>NAIP records the date but not the time, so the sun direction has to be fitted. LiDAR and imagery can be years apart, so trees and new buildings won’t line up.</dd>
+      </dl>
+    </article>
+    <article class="flow" id="delight-rebuild">
+      <div><h3><a href="#delight-rebuild">Rebuild under neutral light, imagery as reference only</a></h3><p class="lic">Our code, library materials</p></div>
+      <dl>
+        <dt>In</dt><dd>Everything we have for the place: aerial imagery, LiDAR, licensed street photos, and a material library</dd>
+        <dt>Out</dt><dd>Geometry and PBR materials authored clean, with no lighting baked in</dd>
+        <dt>Driven by</dt><dd>Agents in headless Blender, picking a library material per surface and measuring its colour from the sunlit pixels <span class="route ours">Ours</span></dd>
+        <dt>Idea</dt><dd>What artists do when the capture can’t be de-lit: use the photos as reference and rebuild by hand. Nothing is baked in, so there is nothing to remove. Colour only has to be measured once per surface, from the parts in sun.</dd>
+        <dt>Check</dt><dd>Render the rebuild under the fitted sun and compare it with the original photo.</dd>
+        <dt>Breaks on</dt><dd>Fidelity. You get the place’s materials, not its exact pixels, so stains, patches and signage are lost or have to be authored. The hardest path here, and the only one that always ends clean.</dd>
       </dl>
     </article>
   </section>
