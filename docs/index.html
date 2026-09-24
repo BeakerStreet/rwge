@@ -64,6 +64,7 @@
   .mast a:hover { color: var(--magenta); }
 
   .intro { padding-block: 3rem 2rem; display: grid; gap: 1rem; max-width: 44rem; }
+  .intro .tagline { font-family: var(--mono); font-size: var(--small); letter-spacing: 0.08em; text-transform: uppercase; color: var(--magenta); }
   .intro h1 { font-size: clamp(1.9rem, 4.2vw, 2.75rem); font-weight: 800; font-stretch: 82%; line-height: 1.08; }
   .intro p { font-size: 1.125rem; }
   .intro .status { font-family: var(--mono); font-size: var(--small); color: var(--ink); background: var(--paper-2); padding: 0.75rem 1rem; border-radius: 2px; }
@@ -136,6 +137,7 @@
   </header>
 
   <section class="intro" aria-labelledby="h1">
+    <p class="tagline">Play in the real world</p>
     <h1 id="h1">Automation flows for turning a captured place into game assets</h1>
     <p>Each flow runs one existing tool with nobody at the controls, checks what it made, and hands a file to the next flow. One tool per flow, so each can be tested on its own and swapped when something better ships.</p>
     <p class="status">None of these flows is built yet. This is the list we are specifying, one at a time.</p>
